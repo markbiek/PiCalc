@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -52,7 +53,7 @@ public class FullscreenActivity extends Activity {
     private SystemUiHider mSystemUiHider;
     
     private static final int CALC_PI = 1;
-    private static final int TIMER_FREQ = 1000;
+    private static final int TIMER_FREQ = 250;
     
     private static final BigDecimal TWO = new BigDecimal("2");
     private static final BigDecimal FOUR = new BigDecimal("4");
@@ -84,6 +85,7 @@ public class FullscreenActivity extends Activity {
     static class MsgHandler extends Handler {
     	private int digit = 1;
     	private BigDecimal pi = new BigDecimal(0);
+    	public TextView tv;
     	
     	//Pi calculating code cribbed from
     	//http://en.literateprograms.org/Pi_with_Machin's_formula_(Java)
@@ -95,6 +97,10 @@ public class FullscreenActivity extends Activity {
 		      .subtract(arccot(TWO_THIRTY_NINE, calcDigits)))
 		      .setScale(numDigits, RoundingMode.DOWN);
 		}
+		
+		public void setTextView(TextView tv) {
+			this.tv = tv;
+		}
     	
     	@Override
         public void handleMessage(Message msg) {
@@ -104,9 +110,18 @@ public class FullscreenActivity extends Activity {
         		if(msg.arg1 == 1) {
         			//TODO - Do calculation here
         			pi = pi(digit);
-        			Log.i("calcPi", pi.toString());
+      
+        			//Log.i("calcPi", pi.toString());
+        			Log.i("calcPi", "Calculated " + digit + "th iteration of pi");
+        			tv.setText(pi.toString());
         			
         			digit++;
+        			
+        			if(digit > 1 && digit <= 25) {
+        				tv.setTextSize(50);
+        			}else if(digit > 25 && digit <= 100) {
+        				tv.setTextSize(25);
+        			}
         			
         			Message msgNew = new Message();
         			msgNew.copyFrom(msg);
@@ -204,6 +219,9 @@ public class FullscreenActivity extends Activity {
     }
     
     private void sendStartCalcMessage() {
+    	TextView tv = (TextView) findViewById(R.id.fullscreen_content);
+    	
+    	mHandler.setTextView(tv);
     	sendCalcMessage(1);
     }
     
